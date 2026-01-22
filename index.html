@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini TED-Talk: Mental Health in Schools</title>
+    <!-- Library to enable screenshot functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            /* Earthy Palette */
+            --primary-color: #556B2F; /* Dark Olive Green */
+            --primary-light: #F4F7F0; /* Very light sage */
+            --secondary-color: #3B4D21; /* Deep Forest Green */
+            --text-color: #3E2723; /* Dark Brown for softer contrast */
+            --bg-color: #FAF9F6; /* Off-white / Eggshell */
+            --white: #ffffff;
+            --highlight-bg: #FFF8E1; /* Warm Sand */
+            --highlight-border: #D7CCC8; /* Light Brown */
+            --border-color: #D3D3D3;
+            --error-color: #A94442;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            /* Prevent text selection to discourage copying */
+            user-select: none; 
+        }
+        
+        /* Allow selection inside inputs so students can edit their own text */
+        textarea, input {
+            user-select: text;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-align: center;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Navigation Tabs Styling */
+        .tabs-container {
+            background-color: var(--white);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            max-width: 1000px;
+            margin: 0 auto;
+            scrollbar-width: thin; /* Firefox */
+        }
+
+        .tabs::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tabs::-webkit-scrollbar-thumb {
+            background-color: #A6AA9C;
+            border-radius: 3px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: #795548; /* Brownish grey */
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background-color: var(--primary-light);
+            font-weight: 700;
+        }
+
+        /* Main Content Styling */
+        main {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .content-section {
+            display: none; /* Hidden by default */
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease-in-out;
+            border: 1px solid #E0E0E0;
+            position: relative; /* Added for bubble positioning */
+        }
+
+        .content-section.active-section {
+            display: block;
+        }
+
+        /* Thinking Bubble Styling */
+        .thinking-bubble {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--secondary-color);
+            border-radius: 20px;
+            padding: 1rem;
+            width: 180px;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: float 3s ease-in-out infinite;
+            z-index: 5;
+            line-height: 1.3;
+        }
+
+        .thinking-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 40px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: var(--secondary-color) transparent;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @media (max-width: 600px) {
+            .thinking-bubble {
+                position: relative;
+                top: auto;
+                right: auto;
+                width: 100%;
+                margin-bottom: 1.5rem;
+                animation: none; /* Disable float on mobile to save space */
+            }
+            .thinking-bubble::after {
+                display: none; /* Hide tail on mobile */
+            }
+            
+            header h1 {
+                font-size: 1.2rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        /* Highlight Box Styling */
+        .highlight-box {
+            background-color: var(--highlight-bg);
+            border-left: 5px solid var(--secondary-color);
+            padding: 1.2rem;
+            margin-top: 2rem;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #4E342E;
+        }
+
+        .highlight-box strong {
+            color: #3E2723;
+            font-style: normal;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Navigation Buttons (Prev/Next) */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .nav-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Interactive Text Area Styling */
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(85, 107, 47, 0.2);
+        }
+        
+        /* Error state for empty required fields */
+        textarea.error-shake, input[type="text"].error-shake {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 2px rgba(169, 68, 66, 0.2);
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .save-indicator {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+            display: none; 
+            font-style: italic;
+        }
+
+        /* Draft View Styling */
+        .draft-container {
+            background-color: #f4f7fa;
+            border: 1px solid #e1e4e8;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .draft-section {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 1rem;
+        }
+
+        .draft-section:last-child {
+            border-bottom: none;
+        }
+
+        .draft-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .draft-content {
+            font-size: 1.1rem;
+            color: #333;
+            white-space: pre-wrap; /* Preserves line breaks */
+        }
+        
+        .empty-msg {
+            color: #777;
+            font-style: italic;
+        }
+
+        /* New Styling for Tickable Options */
+        .topic-option {
+            display: block;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .topic-option:hover {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+        }
+
+        .topic-option input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            accent-color: var(--primary-color);
+        }
+        
+        /* Highlight selected option */
+        .topic-option:has(input:checked) {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        /* Specific style for individual practice warning */
+        .individual-warning {
+            background-color: #FFF3CD;
+            color: #856404;
+            border: 2px solid #FFEEBA;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        /* Word Count Styling */
+        .word-count-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: -1.4rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .word-count-msg {
+            font-style: italic;
+            transition: color 0.3s;
+        }
+
+        .word-count-msg.under-limit {
+            color: var(--error-color);
+        }
+
+        .word-count-msg.met-limit {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        /* Screenshot Button Styling */
+        .screenshot-btn-container {
+            text-align: right;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .screenshot-btn {
+            background-color: #f8f9fa; 
+            border: 1px solid #ced4da; 
+            color: #6c757d; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .screenshot-btn:hover {
+            background-color: #e2e6ea;
+            color: #495057;
+            border-color: #adb5bd;
+        }
+
+        /* Autosave Badge Styling */
+        .autosave-status {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,0.4);
+            font-weight: 500;
+            pointer-events: none; /* Just a label */
+        }
+        
+        @media (max-width: 600px) {
+            .autosave-status {
+                position: static;
+                margin: 0.5rem auto 0;
+                display: inline-flex;
+                font-size: 0.75rem;
+            }
+            
+            header {
+                padding-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mini TED-Talk: Speaking About Mental Health in Schools</h1>
+        <div class="autosave-status" title="Your work is saved automatically to this browser">
+            <span style="font-size: 1rem;">✅</span> Autosave On
+        </div>
+    </header>
+
+    <div class="tabs-container">
+        <div class="tabs" id="tabList">
+            <!-- Tabs will be generated by JS or static below. Using static for clarity -->
+            <button class="tab-btn active" onclick="attemptTabSwitch(0)">Overview</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(1)">What is it?</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(2)">Step 1: Focus</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(3)">Step 2: Connect</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(4)">Step 3: Reflect</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(5)">Step 4: Vocabulary</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(6)">Step 5: Organize</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(7)">Step 6: Notes</button>
+            <!-- Reordered Tabs -->
+            <button class="tab-btn" onclick="attemptTabSwitch(8)">Step 7: Your Draft</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(9)">Step 8: Write Script</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(10)">Step 9: Practice</button>
+            
+            <button class="tab-btn" onclick="attemptTabSwitch(11)">Sharing</button>
+            <button class="tab-btn" onclick="attemptTabSwitch(12)">Final Reminder</button>
+        </div>
+    </div>
+
+    <main id="contentContainer">
+
+        <!-- Tab 1: Overview -->
+        <div class="content-section active-section">
+            <h2>What is this task about?</h2>
+            
+            <label class="input-label" for="student-name" style="margin-top: 0;">👤 Student Name:</label>
+            <input type="text" id="student-name" class="required-input" placeholder="Enter your full name here...">
+            <div class="save-indicator" id="save-student-name">Saved automatically</div>
+
+            <p>In this activity, you will create a mini TED-talk–style reflection. Your goal is to:</p>
+            <ul>
+                <li>speak clearly and confidently;</li>
+                <li>raise awareness about mental health in schools;</li>
+                <li>connect ideas from the videos, vocabulary, and discussions we have explored.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Tip:</strong> This is not about being perfect or dramatic. It is about communicating a meaningful idea.
+            </div>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" disabled>Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 2: What is it? -->
+        <div class="content-section">
+            <div class="thinking-bubble">💭 Don't forget to take notes for later!</div>
+            <h2>What is a Mini TED-Talk?</h2>
+            <p>A mini TED-talk is:</p>
+            <ul>
+                <li>short (1.5 to 2.5 minutes);</li>
+                <li>focused on one main idea;</li>
+                <li>personal but respectful;</li>
+                <li>spoken naturally, not read.</li>
+            </ul>
+            <p>It usually includes:</p>
+            <ul>
+                <li>an opening idea;</li>
+                <li>a short explanation or example;</li>
+                <li>a closing reflection or message.</li>
+            </ul>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 3: Step 1: Focus -->
+        <!-- Added data attribute to help validation script identify this section needs a radio check -->
+        <div class="content-section" data-radio-group="topic_choice">
+            <h2>Step 1: Choose your focus</h2>
+            <p>Choose one mental health topic that stood out to you:</p>
+            
+            <div style="margin-bottom: 2rem;">
+                <label class="topic-option">
+                    <input type="radio" name="topic_choice" value="Academic Pressure"> Academic Pressure
+                </label>
+                <label class="topic-option">
+                    <input type="radio" name="topic_choice" value="Stress and Expectations"> Stress and Expectations
+                </label>
+                <label class="topic-option">
+                    <input type="radio" name="topic_choice" value="Burnout or Exhaustion"> Burnout or Exhaustion
+                </label>
+                <label class="topic-option">
+                    <input type="radio" name="topic_choice" value="Emotional Well-being at School"> Emotional Well-being at School
+                </label>
+                <label class="topic-option">
+                    <input type="radio" name="topic_choice" value="Asking for Help or Support"> Asking for Help or Support
+                </label>
+                <label class="topic-option">
+                    <input type="radio" name="topic_choice" value="Other"> Other (specify below)
+                </label>
+                <input type="text" id="other_topic_text" placeholder="Type your own topic here..." style="display:none; margin-top: 5px; border-color: var(--secondary-color);">
+            </div>
+            
+            <label class="input-label" for="topic-input">✏️ Why does this topic matter to you?</label>
+            <textarea id="topic-input" class="required-input" placeholder="This topic matters because..."></textarea>
+            <div class="save-indicator" id="save-topic-input">Saved automatically</div>
+
+            <div class="highlight-box">
+                <strong>Ask yourself:</strong> Why does this matter to students? Why did this topic stay with me?
+            </div>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: Step 2: Connect -->
+        <div class="content-section">
+            <h2>Step 2: Connect it to what you watched</h2>
+            <p>Think about the three videos you watched from the <em>Student Mental Health Matters</em> collection. Focus on the specific category you explored:</p>
+            <ul>
+                <li>Suicide Prevention</li>
+                <li>Adverse Childhood Experiences (ACES)</li>
+                <li>Stress & Anxiety</li>
+                <li>Self-Harm</li>
+                <li>Social Media</li>
+            </ul>
+            <p><strong>Answer for yourself:</strong></p>
+            <ul>
+                <li>What patterns or similarities did you see across the three videos?</li>
+                <li>Which specific story, emotion, or fact impacted you the most?</li>
+                <li>How does this specific issue affect students in your own school life?</li>
+            </ul>
+
+            <label class="input-label" for="connect-input">✏️ Draft your connection here:</label>
+            <textarea id="connect-input" class="required-input" placeholder="In the videos about [Category], I noticed that... One thing that impacted me was... This connects to our school because..."></textarea>
+            <div class="save-indicator" id="save-connect-input">Saved automatically</div>
+
+            <p><strong>You may:</strong></p>
+            <ul>
+                <li>mention specific examples from the videos;</li>
+                <li>discuss the category generally;</li>
+                <li>focus on the emotional impact rather than just details.</li>
+            </ul>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 5: Step 3: Reflect -->
+        <div class="content-section">
+            <h2>Step 3: Add your own reflection</h2>
+            <p>Now shift the focus to your voice. You can talk about:</p>
+            <ul>
+                <li>why this situation feels common in schools;</li>
+                <li>how it affects students emotionally or academically;</li>
+                <li>what you have observed in school life.</li>
+            </ul>
+            
+            <label class="input-label" for="reflect-input">✏️ Your personal reflection:</label>
+            <textarea id="reflect-input" class="required-input" placeholder="I feel this is common because... I have observed that..."></textarea>
+            <div class="save-indicator" id="save-reflect-input">Saved automatically</div>
+
+            <p>You may use:</p>
+            <ul>
+                <li>personal examples;</li>
+                <li>close experiences;</li>
+                <li>general observations.</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>Important:</strong> Only share what you feel comfortable sharing.
+            </div>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 6: Step 4: Vocabulary -->
+        <div class="content-section">
+            <h2>Step 4: Use the vocabulary we learned</h2>
+            <p>Try to include at least 2 or 3 expressions from our vocabulary list.</p>
+            
+            <div style="background-color: var(--primary-light); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--primary-color);">
+                <p style="margin-bottom: 0.5rem; font-weight: bold; color: var(--secondary-color);">📚 Study the vocabulary here:</p>
+                <a href="https://quizlet.com/co/1133010314/about-mental-health-flash-cards/?funnelUUID=d067af3b-3fae-4c8b-844d-f5f3ddbd5ff2" target="_blank" style="color: var(--primary-color); text-decoration: underline; font-weight: 600;">Open Quizlet Flashcards &rarr;</a>
+            </div>
+
+            <p>For example:</p>
+            <ul>
+                <li>feeling under pressure</li>
+                <li>having too much on your plate</li>
+                <li>struggling silently</li>
+                <li>reaching out for help</li>
+                <li>emotional well-being</li>
+            </ul>
+            <p>These expressions help your talk sound clearer and more natural.</p>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 7: Step 5: Organize -->
+        <div class="content-section">
+            <h2>Step 5: Organize your talk</h2>
+            <p>Use this simple structure:</p>
+            
+            <h3 style="margin-top:1rem; color:#555;">Opening</h3>
+            <ul>
+                <li>Introduce your topic or idea.</li>
+            </ul>
+            <!-- Added min-words attribute for validation logic -->
+            <textarea id="org-opening" class="required-input min-word-check" data-min="30" placeholder="Opening: Hi everyone, today I want to talk about..."></textarea>
+            <div class="word-count-wrapper">
+                <div class="save-indicator" id="save-org-opening" style="margin:0; display:none;">Saved automatically</div>
+                <div id="wc-org-opening" class="word-count-msg under-limit">0 / 30 words (Minimum 30 required)</div>
+            </div>
+
+            <h3 style="margin-top:1rem; color:#555;">Middle</h3>
+            <ul>
+                <li>Explain the situation.</li>
+                <li>Connect it to the teen’s experience or school life.</li>
+                <li>Use examples or observations.</li>
+            </ul>
+            <textarea id="org-middle" class="required-input min-word-check" data-min="30" placeholder="Middle: This connects to what we heard... For example..."></textarea>
+            <div class="word-count-wrapper">
+                <div class="save-indicator" id="save-org-middle" style="margin:0; display:none;">Saved automatically</div>
+                <div id="wc-org-middle" class="word-count-msg under-limit">0 / 30 words (Minimum 30 required)</div>
+            </div>
+
+
+            <h3 style="margin-top:1rem; color:#555;">Closing</h3>
+            <ul>
+                <li>Share a final thought.</li>
+                <li>You may suggest awareness or a small change, but it is optional.</li>
+            </ul>
+            <textarea id="org-closing" class="required-input min-word-check" data-min="30" placeholder="Closing: To finish, I think we should remember..."></textarea>
+            <div class="word-count-wrapper">
+                <div class="save-indicator" id="save-org-closing" style="margin:0; display:none;">Saved automatically</div>
+                <div id="wc-org-closing" class="word-count-msg under-limit">0 / 30 words (Minimum 30 required)</div>
+            </div>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 8: Step 6: Notes -->
+        <div class="content-section">
+            <h2>Step 6: Prepare notes, not a script</h2>
+            <p>You may:</p>
+            <ul>
+                <li>write keywords;</li>
+                <li>use bullet points;</li>
+                <li>note important expressions.</li>
+            </ul>
+            
+            <label class="input-label" for="notes-input">✏️ Final Bullet Point Notes:</label>
+            <textarea id="notes-input" class="required-input" placeholder="- Point 1&#10;- Point 2&#10;- Key expression"></textarea>
+            <div class="save-indicator" id="save-notes-input">Saved automatically</div>
+
+            <p>Try not to:</p>
+            <ul>
+                <li>write full sentences;</li>
+                <li>memorize your text.</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>Goal:</strong> Your goal is to sound natural, not perfect.
+            </div>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 9: Step 7: Your Draft (Moved & Renamed from Index 9 to 8) -->
+        <div class="content-section" id="draft-section">
+            <h2>Step 7: Your Compiled Draft</h2>
+            <p>Here is a compilation of all your notes and thoughts from the previous steps. Use this to review before writing your final script.</p>
+            
+            <!-- Added white background and padding for better screenshot appearance -->
+            <div class="draft-container" id="draft-content-area" style="background-color: #ffffff; padding: 2rem;">
+                <!-- Content will be injected here via JS -->
+            </div>
+            
+            <div style="text-align: right; margin-top: 1rem;">
+                <button onclick="downloadDraft()" id="downloadBtn" style="background:none; border:none; color:var(--primary-color); cursor:pointer; text-decoration:underline; font-size: 0.95rem; font-weight: 600;">⬇️ Download Draft as Image</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 10: Step 8: Write Script (NEW Tab) -->
+        <div class="content-section">
+            <h2>Step 8: Write your full script</h2>
+            <p>Now that you have organized your ideas and reviewed your draft, write your full speech below.</p>
+            
+            <label class="input-label" for="full-script-input">📝 Full Script:</label>
+            <textarea id="full-script-input" class="required-input" style="min-height: 300px; font-size: 1.1rem; line-height: 1.8;" placeholder="Start writing your full Mini TED-Talk here..."></textarea>
+            <div class="save-indicator" id="save-full-script-input">Saved automatically</div>
+
+            <div class="highlight-box">
+                <strong>Tip:</strong> Read it aloud as you write to check if it sounds natural.
+            </div>
+
+            <!-- Screenshot Button -->
+            <div class="screenshot-btn-container">
+                <button class="screenshot-btn" onclick="downloadSection(this)">📸 Save Screenshot</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 11: Step 9: Practice (Moved & Renamed from Index 8 to 10) -->
+        <div class="content-section">
+            <h2>Step 9: Practice your mini TED-talk</h2>
+            
+            <div class="individual-warning">
+                ⚠️ IMPORTANT: Practice INDIVIDUALLY.<br>
+                Do not practice in groups or with partners.
+            </div>
+
+            <p>Practice speaking:</p>
+            <ul>
+                <li>at a calm pace;</li>
+                <li>clearly and audibly;</li>
+                <li>with pauses when needed.</li>
+            </ul>
+            
+            <div style="text-align: center; margin: 2rem 0; padding: 2rem; background: #fff; border: 2px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin-bottom: 1rem; color: var(--secondary-color);">⏱️ Rehearsal Timer</h3>
+                <div id="stopwatch" style="font-size: 3rem; font-weight: bold; color: var(--text-color); font-family: monospace; margin-bottom: 1rem;">00:00</div>
+                <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: #666;">Target Time: 1:30 - 2:30 minutes</div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="startTimer()" style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Start</button>
+                    <button onclick="stopTimer()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Stop</button>
+                    <button onclick="resetTimer()" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Reset</button>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <strong>Remember:</strong> Confidence grows with practice.
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 12: Sharing (Index 11) -->
+        <div class="content-section">
+            <h2>How will you share it?</h2>
+            <p>You must:</p>
+            <ul>
+                <li>record a video of your talk;</li>
+                <li>edit the video to ensure it is clear and engaging.</li>
+            </ul>
+            <p>Your teacher will tell you:</p>
+            <ul>
+                <li>where to upload your video file;</li>
+                <li>how it will be assessed.</li>
+            </ul>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" onclick="nextTab()">Next &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Tab 13: Final Reminder (Index 12) -->
+        <div class="content-section">
+            <h2>Final reminder</h2>
+            <p>This task is about:</p>
+            <ul>
+                <li>expressing ideas clearly;</li>
+                <li>showing awareness;</li>
+                <li>respecting yourself and others.</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>Note:</strong> There is no single “correct” talk. Your voice and your perspective matter.
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
+                <button class="nav-btn" disabled>Next &rarr;</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentTab = 0;
+        const totalTabs = 13; 
+
+        // Restriction: Disable copy, cut, paste
+        document.addEventListener('copy', (e) => { e.preventDefault(); alert('Copying is disabled to encourage original writing.'); });
+        document.addEventListener('cut', (e) => { e.preventDefault(); alert('Cutting is disabled.'); });
+        document.addEventListener('paste', (e) => { e.preventDefault(); alert('Pasting is disabled. Please type your own thoughts.'); });
+
+        // Load saved data on startup
+        window.onload = function() {
+            // 1. Load Text Inputs
+            const inputs = document.querySelectorAll('textarea, input[type="text"]');
+            inputs.forEach(input => {
+                const saved = localStorage.getItem(input.id);
+                if (saved) {
+                    input.value = saved;
+                }
+
+                // If this is a word count input, update the count immediately on load
+                if (input.classList.contains('min-word-check')) {
+                    updateWordCountDisplay(input);
+                }
+                
+                input.addEventListener('input', function() {
+                    localStorage.setItem(this.id, this.value);
+                    this.classList.remove('error-shake');
+                    
+                    // Update word count if applicable
+                    if (this.classList.contains('min-word-check')) {
+                        updateWordCountDisplay(this);
+                    }
+
+                    const indicator = document.getElementById('save-' + this.id);
+                    if(indicator) {
+                        indicator.style.display = 'block';
+                        setTimeout(() => {
+                            indicator.style.display = 'none';
+                        }, 2000);
+                    }
+                });
+            });
+
+            // 2. Load Radio Buttons
+            const radios = document.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                const savedValue = localStorage.getItem(radio.name);
+                if (savedValue === radio.value) {
+                    radio.checked = true;
+                }
+                
+                radio.addEventListener('change', function() {
+                    if(this.checked) {
+                        localStorage.setItem(this.name, this.value);
+                        handleOtherTopicVisibility();
+                    }
+                });
+            });
+
+            // Initial check for Other visibility
+            handleOtherTopicVisibility();
+        };
+
+        // Helper: Count words
+        function countWords(str) {
+            return str.trim().split(/\s+/).filter(word => word.length > 0).length;
+        }
+
+        // Helper: Update UI for word count
+        function updateWordCountDisplay(input) {
+            const min = parseInt(input.getAttribute('data-min'));
+            const count = countWords(input.value);
+            const displayId = 'wc-' + input.id;
+            const displayEl = document.getElementById(displayId);
+
+            if (displayEl) {
+                displayEl.textContent = `${count} / ${min} words (Minimum ${min} required)`;
+                if (count >= min) {
+                    displayEl.classList.remove('under-limit');
+                    displayEl.classList.add('met-limit');
+                    displayEl.textContent = `${count} / ${min} words (Requirement met ✅)`;
+                } else {
+                    displayEl.classList.remove('met-limit');
+                    displayEl.classList.add('under-limit');
+                }
+            }
+        }
+
+        function handleOtherTopicVisibility() {
+            const otherRadio = document.querySelector('input[name="topic_choice"][value="Other"]');
+            const otherInput = document.getElementById('other_topic_text');
+            
+            if (otherRadio && otherInput) {
+                if (otherRadio.checked) {
+                    otherInput.style.display = 'block';
+                    otherInput.classList.add('required-input'); 
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.classList.remove('required-input'); 
+                }
+            }
+        }
+
+        function generateDraft() {
+            const container = document.getElementById('draft-content-area');
+            
+            // Helper to get value
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el && el.value.trim() ? el.value : '<span class="empty-msg">(No input provided)</span>';
+            };
+
+            // Helper to get radio value
+            const getRadioVal = (name) => {
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) return '<span class="empty-msg" style="color:red;">(No topic selected)</span>';
+                
+                // If "Other" is selected, return the text from the custom input
+                if (checked.value === 'Other') {
+                    const otherText = document.getElementById('other_topic_text').value;
+                    return otherText ? otherText + ' (Custom Topic)' : 'Other (Unspecified)';
+                }
+                
+                return checked.value;
+            }
+
+            // Added a Header inside the draft so the downloaded image has a title
+            const html = `
+                <div style="border-bottom: 2px solid #eee; margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+                    <h2 style="color: #556B2F; font-size: 1.5rem; margin-bottom: 0;">My Mini TED-Talk Draft</h2>
+                    <p style="color: #333; font-size: 1.1rem; font-weight: bold; margin-top: 0.5rem;">By: ${getVal('student-name')}</p>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.2rem;">Mental Health in Schools Reflection</p>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Selected Topic</div>
+                    <div class="draft-content" style="font-weight:bold; color: #556B2F;">${getRadioVal('topic_choice')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Why it matters</div>
+                    <div class="draft-content">${getVal('topic-input')}</div>
+                </div>
+                
+                <div class="draft-section">
+                    <div class="draft-label">Connection to Documentary</div>
+                    <div class="draft-content">${getVal('connect-input')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Personal Reflection</div>
+                    <div class="draft-content">${getVal('reflect-input')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Draft Structure: Opening</div>
+                    <div class="draft-content">${getVal('org-opening')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Draft Structure: Middle</div>
+                    <div class="draft-content">${getVal('org-middle')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Draft Structure: Closing</div>
+                    <div class="draft-content">${getVal('org-closing')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Key Notes & Bullet Points</div>
+                    <div class="draft-content">${getVal('notes-input')}</div>
+                </div>
+
+                <div class="draft-section">
+                    <div class="draft-label">Full Script</div>
+                    <div class="draft-content">${getVal('full-script-input')}</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function downloadDraft() {
+            const element = document.getElementById('draft-content-area');
+            const btn = document.getElementById('downloadBtn');
+            const originalText = btn.innerText;
+
+            // Visual Feedback
+            btn.innerText = "Generating Image...";
+            btn.style.cursor = "wait";
+            
+            // Use html2canvas to capture the element
+            html2canvas(element, {
+                scale: 2, // 2x scale for better resolution (Retina-like)
+                backgroundColor: "#ffffff", // Ensure background is white, not transparent
+                useCORS: true
+            }).then(canvas => {
+                // Convert canvas to image data URL
+                const image = canvas.toDataURL("image/png");
+
+                // Create a temporary link to trigger download
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = 'My-TED-Talk-Draft.png';
+                link.click();
+                
+                // Reset button
+                btn.innerText = originalText;
+                btn.style.cursor = "pointer";
+            }).catch(err => {
+                console.error("Screenshot error:", err);
+                alert("Could not generate image. Please try taking a manual screenshot.");
+                btn.innerText = originalText;
+                btn.style.cursor = "pointer";
+            });
+        }
+
+        // Function to download individual sections/tabs
+        function downloadSection(button) {
+            // Find the closest content-section parent
+            const section = button.closest('.content-section');
+            const originalText = button.innerText;
+
+            button.innerText = "Saving...";
+            button.style.cursor = "wait";
+
+            // Use html2canvas to capture the specific section
+            html2canvas(section, {
+                scale: 2, // High resolution
+                backgroundColor: "#ffffff",
+                useCORS: true
+            }).then(canvas => {
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.href = image;
+                
+                // Create a clean filename from the header text
+                let title = "TED_Talk_Section";
+                const h2 = section.querySelector('h2');
+                if (h2) {
+                    title = h2.innerText.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+                }
+                
+                link.download = `${title}.png`;
+                link.click();
+                
+                button.innerText = originalText;
+                button.style.cursor = "pointer";
+            }).catch(err => {
+                console.error(err);
+                alert("Error saving screenshot. You might need to use your computer's screenshot tool.");
+                button.innerText = originalText;
+                button.style.cursor = "pointer";
+            });
+        }
+
+        // New Logic: Check if current tab is valid before moving forward
+        function isCurrentTabValid() {
+            const sections = document.getElementsByClassName("content-section");
+            const currentSection = sections[currentTab];
+            let allValid = true;
+            
+            // 1. Check Text Inputs (Empty check)
+            const requiredInputs = currentSection.querySelectorAll('.required-input');
+            
+            requiredInputs.forEach(input => {
+                // Basic empty check
+                if (!input.value.trim()) {
+                    allValid = false;
+                    input.classList.add('error-shake');
+                    setTimeout(() => input.classList.remove('error-shake'), 500);
+                }
+                
+                // Word Count Check (if applicable)
+                if (input.classList.contains('min-word-check')) {
+                    const min = parseInt(input.getAttribute('data-min'));
+                    const count = countWords(input.value);
+                    if (count < min) {
+                        allValid = false;
+                        input.classList.add('error-shake');
+                        setTimeout(() => input.classList.remove('error-shake'), 500);
+                        // Also highlight the text message
+                        const msg = document.getElementById('wc-' + input.id);
+                        if(msg) {
+                            msg.style.fontWeight = "bold";
+                            setTimeout(() => msg.style.fontWeight = "normal", 1000);
+                        }
+                    }
+                }
+            });
+
+            // 2. Check Radio Buttons (if the section has a data-radio-group attribute)
+            const radioGroupName = currentSection.dataset.radioGroup;
+            if (radioGroupName) {
+                const checked = currentSection.querySelector(`input[name="${radioGroupName}"]:checked`);
+                if (!checked) {
+                    allValid = false;
+                    // Shake the container of radio buttons
+                    const container = currentSection.querySelector('div[style*="margin-bottom: 2rem"]'); // Targeting the div wrapping radios
+                    if(container) {
+                        container.style.border = "1px solid var(--error-color)";
+                        container.style.borderRadius = "8px";
+                        container.style.padding = "10px";
+                        setTimeout(() => {
+                            container.style.border = "none";
+                            container.style.padding = "0";
+                        }, 1000);
+                    }
+                }
+            }
+
+            if (!allValid) {
+                // Specific message for word count
+                const hasWordCountError = Array.from(requiredInputs).some(input => 
+                    input.classList.contains('min-word-check') && countWords(input.value) < parseInt(input.getAttribute('data-min'))
+                );
+
+                if (hasWordCountError) {
+                    alert("Please make sure you have met the minimum word count requirement (30 words) for all sections.");
+                } else {
+                    alert("Please complete all required fields (including selecting options) in this section before moving forward.");
+                }
+            }
+
+            return allValid;
+        }
+
+        function attemptTabSwitch(targetIndex) {
+            // Allow moving backward anytime
+            if (targetIndex < currentTab) {
+                openTab(targetIndex);
+                return;
+            }
+
+            // If moving forward, validate current tab
+            if (isCurrentTabValid()) {
+                openTab(targetIndex);
+            }
+        }
+
+        function openTab(tabIndex) {
+            // Update State
+            currentTab = tabIndex;
+            
+            // If opening the draft tab (index 8 now), generate content
+            if (tabIndex === 8) {
+                generateDraft();
+            }
+
+            // Get all tabs and content sections
+            const tabs = document.getElementsByClassName("tab-btn");
+            const sections = document.getElementsByClassName("content-section");
+
+            // Hide all sections and remove active class from tabs
+            for (let i = 0; i < sections.length; i++) {
+                sections[i].style.display = "none";
+                sections[i].classList.remove("active-section");
+                tabs[i].classList.remove("active");
+            }
+
+            // Show current section and activate current tab
+            sections[tabIndex].style.display = "block";
+            
+            // Trigger animation
+            setTimeout(() => {
+                sections[tabIndex].classList.add("active-section");
+            }, 10);
+            
+            tabs[tabIndex].classList.add("active");
+
+            // Scroll the tab button into view (for mobile UX)
+            tabs[tabIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+
+            // Scroll to top of content
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextTab() {
+            if (currentTab < totalTabs - 1) {
+                attemptTabSwitch(currentTab + 1);
+            }
+        }
+
+        function prevTab() {
+            if (currentTab > 0) {
+                openTab(currentTab - 1);
+            }
+        }
+
+        /* --- Stopwatch Logic --- */
+        let timerInterval;
+        let startTime;
+        let elapsedTime = 0;
+        let isRunning = false;
+
+        function updateDisplay() {
+            const totalSeconds = Math.floor(elapsedTime / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            const displayMin = minutes < 10 ? '0' + minutes : minutes;
+            const displaySec = seconds < 10 ? '0' + seconds : seconds;
+            
+            document.getElementById('stopwatch').textContent = `${displayMin}:${displaySec}`;
+            
+            // Visual Feedback for target time
+            const stopwatchEl = document.getElementById('stopwatch');
+            if (totalSeconds >= 90 && totalSeconds <= 150) {
+                stopwatchEl.style.color = "#28a745"; // Green for good range
+            } else if (totalSeconds > 150) {
+                stopwatchEl.style.color = "#dc3545"; // Red for too long
+            } else {
+                stopwatchEl.style.color = "var(--text-color)"; // Default
+            }
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(function() {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 100);
+                isRunning = true;
+            }
+        }
+
+        function stopTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+            }
+        }
+
+        function resetTimer() {
+            stopTimer();
+            elapsedTime = 0;
+            updateDisplay();
+            document.getElementById('stopwatch').style.color = "var(--text-color)";
+        }
+    </script>
+</body>
+</html>
