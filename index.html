@@ -1254,26 +1254,34 @@
             const btn = document.getElementById('downloadBtn');
             const originalText = btn.innerText;
 
-            // Visual Feedback
             btn.innerText = "Generating Image...";
             btn.style.cursor = "wait";
             
-            // Use html2canvas to capture the element
             html2canvas(element, {
-                scale: 2, // 2x scale for better resolution (Retina-like)
-                backgroundColor: "#ffffff", // Ensure background is white, not transparent
-                useCORS: true
+                scale: 2, 
+                backgroundColor: "#ffffff", 
+                useCORS: true,
+                onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById('draft-content-area');
+                    if (clonedElement) {
+                        // FORCE STYLES FOR SCREENSHOT
+                        clonedElement.style.color = "#000000";
+                        clonedElement.style.backgroundColor = "#ffffff";
+                        
+                        // Force all children text to black
+                        const allElements = clonedElement.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            el.style.color = "#000000";
+                        });
+                    }
+                }
             }).then(canvas => {
-                // Convert canvas to image data URL
                 const image = canvas.toDataURL("image/png");
-
-                // Create a temporary link to trigger download
                 const link = document.createElement('a');
                 link.href = image;
                 link.download = 'My-TED-Talk-Draft.png';
                 link.click();
                 
-                // Reset button
                 btn.innerText = originalText;
                 btn.style.cursor = "pointer";
             }).catch(err => {
@@ -1293,11 +1301,44 @@
             button.innerText = "Saving...";
             button.style.cursor = "wait";
 
-            // Use html2canvas to capture the specific section
             html2canvas(section, {
                 scale: 2, // High resolution
                 backgroundColor: "#ffffff",
-                useCORS: true
+                useCORS: true,
+                onclone: (clonedDoc) => {
+                    // Find the cloned section in the dummy document
+                    // We need to query it again because 'section' refers to the original DOM
+                    const clonedSection = clonedDoc.body.querySelector('.content-section.active-section') || clonedDoc.body.querySelector('.content-section');
+                    
+                    if (clonedSection) {
+                        // 1. REMOVE ANIMATIONS (Critical for fixing white/blank screenshots)
+                        clonedSection.style.animation = 'none';
+                        clonedSection.style.transform = 'none';
+                        clonedSection.style.transition = 'none';
+                        
+                        // 2. FORCE COLORS
+                        clonedSection.style.color = "#000000";
+                        clonedSection.style.backgroundColor = "#ffffff";
+
+                        // 3. Force Inputs/Textareas to be visible and black
+                        const inputs = clonedSection.querySelectorAll('textarea, input');
+                        inputs.forEach(input => {
+                            input.style.color = "#000000";
+                            input.style.borderColor = "#333333";
+                            input.style.backgroundColor = "#ffffff";
+                            // Ensure text inside is black
+                            input.style.webkitTextFillColor = "#000000";
+                        });
+
+                        // 4. Force Headers and Text to be black
+                        const texts = clonedSection.querySelectorAll('h2, h3, p, ul, li, label, strong, span');
+                        texts.forEach(t => t.style.color = "#000000");
+                        
+                        // 5. Hide the screenshot button in the image
+                        const btnContainer = clonedSection.querySelector('.screenshot-btn-container');
+                        if(btnContainer) btnContainer.style.display = 'none';
+                    }
+                }
             }).then(canvas => {
                 const image = canvas.toDataURL("image/png");
                 const link = document.createElement('a');
