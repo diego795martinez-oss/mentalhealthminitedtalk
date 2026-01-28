@@ -535,6 +535,124 @@
             flex-direction: column;
         }
         
+        /* Video Recorder Styling */
+        .recorder-wrapper {
+            margin-top: 1rem;
+        }
+        
+        .script-prompter {
+            background: #fff;
+            padding: 20px;
+            border: 2px solid var(--primary-light);
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .script-prompter h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            color: #888;
+            text-transform: uppercase;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background: #fff;
+        }
+
+        .video-interface {
+            background: #222;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        video {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 8px;
+            background: #000;
+            margin-bottom: 15px;
+            border: 2px solid #444;
+        }
+        
+        .rec-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .rec-btn {
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        
+        .rec-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .rec-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .btn-camera { background: #17a2b8; color: white; }
+        .btn-record { background: #dc3545; color: white; }
+        .btn-stop { background: #6c757d; color: white; }
+        
+        .recording-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: red;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1s infinite;
+            display: none;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        .download-video-btn {
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .download-video-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
         @media (max-width: 768px) {
             .split-view-container {
                 grid-template-columns: 1fr;
@@ -969,15 +1087,46 @@
         <!-- Tab 12: Sharing (Index 11) -->
         <div class="content-section">
             <h2>How will you share it?</h2>
-            <p>You must:</p>
+            
+            <p>Use the tool below to record your Mini TED-Talk. Your script is displayed at the top to help you.</p>
+
+            <div class="recorder-wrapper">
+                <!-- Script Display -->
+                <div class="script-prompter">
+                    <h3>Your Script</h3>
+                    <div id="sharing-script-display">(Your script will appear here...)</div>
+                </div>
+
+                <!-- Video Interface -->
+                <div class="video-interface">
+                    <!-- Live Preview -->
+                    <video id="live-preview" autoplay muted playsinline></video>
+                    
+                    <!-- Playback (Hidden initially) -->
+                    <video id="recorded-playback" controls style="display:none;"></video>
+                    
+                    <div class="rec-controls">
+                        <button id="btn-camera" class="rec-btn btn-camera" onclick="enableCamera()">📷 Enable Camera</button>
+                        
+                        <button id="btn-start-record" class="rec-btn btn-record" onclick="startRecording()" disabled>
+                            <span class="recording-indicator" id="rec-dot"></span> 🔴 Start Recording
+                        </button>
+                        
+                        <button id="btn-stop-record" class="rec-btn btn-stop" onclick="stopRecording()" disabled>⬛ Stop Recording</button>
+                    </div>
+
+                    <div id="download-area" style="margin-top: 15px; display: none;">
+                        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 5px;">Review your video above. If you like it, download it!</p>
+                        <a id="download-video-link" class="download-video-btn">⬇️ Download Video</a>
+                        <button onclick="resetRecorder()" style="background:none; border:none; color:#bbb; text-decoration:underline; cursor:pointer; margin-left:15px; font-size:0.9rem;">Discard & Record Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 2rem;"><strong>After recording:</strong></p>
             <ul>
-                <li>record a video of your talk;</li>
-                <li>edit the video to ensure it is clear and engaging.</li>
-            </ul>
-            <p>Your teacher will tell you:</p>
-            <ul>
-                <li>where to upload your video file;</li>
-                <li>how it will be assessed.</li>
+                <li>Download the video file.</li>
+                <li>Your teacher will tell you where to upload your video file and how it will be assessed.</li>
             </ul>
             <div class="nav-buttons">
                 <button class="nav-btn" onclick="prevTab()">&larr; Previous</button>
@@ -1556,6 +1705,178 @@
             elapsedTime = 0;
             updateDisplay();
             document.getElementById('stopwatch').style.color = "var(--text-color)";
+        }
+
+        /* --- Video Recording Logic --- */
+        let mediaRecorder;
+        let recordedChunks = [];
+        let stream;
+
+        async function enableCamera() {
+            const preview = document.getElementById('live-preview');
+            const btnCamera = document.getElementById('btn-camera');
+            const btnStart = document.getElementById('btn-start-record');
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                preview.srcObject = stream;
+                preview.style.display = 'block';
+                document.getElementById('recorded-playback').style.display = 'none';
+                document.getElementById('download-area').style.display = 'none';
+                
+                btnCamera.style.display = 'none'; // Hide enable button
+                btnStart.disabled = false;
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                alert("Could not access camera. Please allow camera permissions or check your device settings.");
+            }
+        }
+
+        function startRecording() {
+            recordedChunks = [];
+            try {
+                // Support multiple mimeTypes
+                const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    delete options.mimeType; // Fallback to default
+                }
+                
+                mediaRecorder = new MediaRecorder(stream, options);
+
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = function() {
+                    const blob = new Blob(recordedChunks, {
+                        type: 'video/webm'
+                    });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const preview = document.getElementById('live-preview');
+                    const playback = document.getElementById('recorded-playback');
+                    const downloadLink = document.getElementById('download-video-link');
+                    const downloadArea = document.getElementById('download-area');
+                    
+                    // Switch views
+                    preview.style.display = 'none';
+                    playback.style.display = 'block';
+                    playback.src = url;
+                    
+                    // Setup download
+                    downloadLink.href = url;
+                    downloadLink.download = `My_TED_Talk_${new Date().toISOString().slice(0,10)}.webm`;
+                    downloadArea.style.display = 'block';
+                };
+
+                mediaRecorder.start();
+                
+                // UI Updates
+                document.getElementById('btn-start-record').disabled = true;
+                document.getElementById('btn-stop-record').disabled = false;
+                document.getElementById('rec-dot').style.display = 'inline-block';
+                
+            } catch (err) {
+                console.error("Error starting recording:", err);
+                alert("Could not start recording.");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                
+                // UI Updates
+                document.getElementById('btn-start-record').disabled = false;
+                document.getElementById('btn-stop-record').disabled = true;
+                document.getElementById('rec-dot').style.display = 'none';
+            }
+        }
+
+        function resetRecorder() {
+            const preview = document.getElementById('live-preview');
+            const playback = document.getElementById('recorded-playback');
+            const downloadArea = document.getElementById('download-area');
+            
+            playback.pause();
+            playback.src = "";
+            playback.style.display = 'none';
+            preview.style.display = 'block';
+            downloadArea.style.display = 'none';
+            
+            // Re-enable Start button if stream is still active
+            if (stream && stream.active) {
+                document.getElementById('btn-start-record').disabled = false;
+            } else {
+                // If stream died, ask to enable again
+                document.getElementById('btn-camera').style.display = 'inline-flex';
+                document.getElementById('btn-start-record').disabled = true;
+            }
+        }
+        
+        function updateSharingScript() {
+            const scriptInput = document.getElementById('full-script-input');
+            const display = document.getElementById('sharing-script-display');
+            
+            if (scriptInput && scriptInput.value.trim()) {
+                display.innerText = scriptInput.value;
+            } else {
+                display.innerHTML = '<span style="color:#999; font-style:italic;">(No script detected. Go back to Step 8 to write your script!)</span>';
+            }
+        }
+
+        // Modified openTab to handle Sharing Tab specific updates
+        function openTab(tabIndex) {
+            // Update State
+            currentTab = tabIndex;
+            
+            // If opening the draft tab (index 8), generate content
+            if (tabIndex === 8) {
+                generateDraft();
+            }
+            
+            // If opening the Script Write tab (index 9), generate reference panel
+            if (tabIndex === 9) {
+                generateReferencePanel();
+            }
+            
+            // If opening the Sharing/Recording tab (index 11), update script display
+            if (tabIndex === 11) {
+                updateSharingScript();
+            }
+
+            // Get all tabs and content sections
+            const tabs = document.getElementsByClassName("tab-btn");
+            const sections = document.getElementsByClassName("content-section");
+
+            // Hide all sections and remove active class from tabs
+            for (let i = 0; i < sections.length; i++) {
+                sections[i].style.display = "none";
+                sections[i].classList.remove("active-section");
+                tabs[i].classList.remove("active");
+            }
+
+            // Show current section and activate current tab
+            sections[tabIndex].style.display = "block";
+            
+            // Trigger animation
+            setTimeout(() => {
+                sections[tabIndex].classList.add("active-section");
+            }, 10);
+            
+            tabs[tabIndex].classList.add("active");
+
+            // Scroll the tab button into view (for mobile UX)
+            tabs[tabIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+
+            // Scroll to top of content
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
