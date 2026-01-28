@@ -1062,6 +1062,12 @@
                 <li>clearly and audibly;</li>
                 <li>with pauses when needed.</li>
             </ul>
+
+            <!-- Added Script Display for Practice -->
+            <div class="script-prompter" style="margin-bottom: 2rem;">
+                <h3>Your Script (Read while practicing)</h3>
+                <div id="practice-script-display">(Your script will appear here...)</div>
+            </div>
             
             <div style="text-align: center; margin: 2rem 0; padding: 2rem; background: #fff; border: 2px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <h3 style="margin-bottom: 1rem; color: var(--secondary-color);">⏱️ Rehearsal Timer</h3>
@@ -1827,6 +1833,18 @@
             }
         }
 
+        // New function to update the script in the Practice tab
+        function updatePracticeScript() {
+            const scriptInput = document.getElementById('full-script-input');
+            const display = document.getElementById('practice-script-display');
+            
+            if (scriptInput && scriptInput.value.trim()) {
+                display.innerText = scriptInput.value;
+            } else {
+                display.innerHTML = '<span style="color:#999; font-style:italic;">(No script detected. Go back to Step 8 to write your script!)</span>';
+            }
+        }
+
         // Modified openTab to handle Sharing Tab specific updates
         function openTab(tabIndex) {
             // Update State
@@ -1842,7 +1860,12 @@
                 generateReferencePanel();
             }
             
-            // If opening the Sharing/Recording tab (index 11), update script display
+            // If opening the Practice tab (index 10), update practice script display
+            if (tabIndex === 10) {
+                updatePracticeScript();
+            }
+            
+            // If opening the Sharing/Recording tab (index 11), update sharing script display
             if (tabIndex === 11) {
                 updateSharingScript();
             }
